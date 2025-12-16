@@ -1,19 +1,59 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+//﻿---------------------------------------------------------------------------------------------------------
+// Author       : 이혜성
+// Date       : 2025-12-14
+// Copyright   : 회사 또는 팀 이름
+//
+// Description : 페이즈 1에서 사용할 몬스터의 클래스.
+//               SZCharacterBase를 상속받아 사용하고 메시와 애니메이션 블루프린트를 바꿔서 사용함.
+//               
+//                 
+//----------------------------------------------------------------------------------------------------------
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Character/SZCharacterBase.h"
+#include "Interface/SZNormalAIInterface.h"
+#include "SZNormalMonsterAttackData.h"
 #include "SZNormalMonster.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
-class PROJECTSEOULZ_API ASZNormalMonster : public ASZCharacterBase
+class PROJECTSEOULZ_API ASZNormalMonster : public ASZCharacterBase, public ISZNormalAIInterface
 {
 	GENERATED_BODY()
 	
 public:
 	ASZNormalMonster();
+
+	FORCEINLINE UBTTask_Attack* GetAttackTask(){ return CurrentAttackTask; }
+
+// AI Section
+protected:
+	virtual float GetAIPatrolRadius() override;
+	virtual float GetAIDetectRange() override;
+	virtual float GetAIAttackRange() override;
+	virtual float GetAITurnSpeed() override;
+
+	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
+	virtual void AttackByAI(class UBTTask_Attack* Task) override;
+
+	FAICharacterAttackFinished OnAttackFinished;
+
+	virtual UAnimMontage* GetAttackAnimMontage() override;
+	virtual int GetSectionCount() override;
+
+	UPROPERTY()
+	UBTTask_Attack* CurrentAttackTask;
+
+protected:
+	virtual void PossessedBy(AController* NewController) override;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Attack")
+	TObjectPtr<class USZNormalMonsterAttackData> AttackDataAsset;
+
+	
+	
 };
