@@ -1,13 +1,13 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Character/SZCharacterPlayer.h"
+#include "Player/SZCharacterPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "SZCharacterControlData.h"
+#include "Character/SZCharacterControlData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 ASZCharacterPlayer::ASZCharacterPlayer()
@@ -79,21 +79,29 @@ void ASZCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	UE_LOG(LogTemp, Warning, TEXT("SetupPlayerInputComponent called: %s"), *GetName());
+
+	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	UE_LOG(LogTemp, Warning, TEXT("EnhancedInputComponent=%s"), EIC ? TEXT("VALID") : TEXT("NULL"));
+
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
 
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASZCharacterPlayer::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASZCharacterPlayer::Look);
-	/*EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ASZCharacterPlayer::MouseLook);*/
-	EnhancedInputComponent->BindAction(ChangeControlAction, ETriggerEvent::Triggered, this, &ASZCharacterPlayer::ChangeCharacterControl);
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Ongoing, this, &ASZCharacterPlayer::Look);
+	EnhancedInputComponent->BindAction(ChangeControlAction, ETriggerEvent::Started, this, &ASZCharacterPlayer::ChangeCharacterControl);
 
 }
 
 void ASZCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	CurrentControlType = ECharacterControlType::ThirdPerson;
+	ApplyThirdPersonSettings(true);
+
+	UE_LOG(LogTemp, Warning, TEXT("IMC Added: %s"), *GetNameSafe(DefaultMappingContext));
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -101,6 +109,7 @@ void ASZCharacterPlayer::BeginPlay()
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		//Subsystem->RemoveMappingContext(DefaultMappingContext);
 	}
+
 }
 
 void ASZCharacterPlayer::SetDead()
@@ -123,9 +132,13 @@ void ASZCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterC
 	if (CurrentControlType == NewCharacterControlType)
 		return;
 
+	AController* PlayerControllerCon = GetController();
+
+	const FRotator SavedControlRotation = PlayerControllerCon ? PlayerControllerCon->GetControlRotation() : FRotator::ZeroRotator;
+
 	CurrentControlType = NewCharacterControlType;
 
-	// 즉시 전환(간단/확실)
+	// 즉시 전환
 	if (NewCharacterControlType == ECharacterControlType::ThirdPerson)
 	{
 		ApplyThirdPersonSettings(true);
@@ -133,6 +146,11 @@ void ASZCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterC
 	else
 	{
 		ApplyFirstPersonSettings(true);
+	}
+
+	if (PlayerControllerCon)
+	{
+		PlayerControllerCon->SetControlRotation(SavedControlRotation);
 	}
 }
 
@@ -171,10 +189,16 @@ void ASZCharacterPlayer::ApplyFirstPersonSettings(bool bInstant)
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 0.f);
 }
 
-//void ASZCharacterPlayer::SetCharacterControlData(const USZCharacterControlData* CharacterControlData)
-//{
-//	Super::SetCharacterControlData(CharacterControlData);
-//}
+void ASZCharacterPlayer::SetCharacterControlData(const USZCharacterControlData* CharacterControlData)
+{
+	CameraBoom->TargetArmLength = CharacterControlData->TargetArmLength;
+	CameraBoom->SetRelativeRotation(CharacterControlData->RelativeRotation);
+	CameraBoom->bUsePawnControlRotation = CharacterControlData->bUsePawnControlRotation;
+	CameraBoom->bInheritPitch = CharacterControlData->bInheritPitch;
+	CameraBoom->bInheritYaw = CharacterControlData->bInheritYaw;
+	CameraBoom->bInheritRoll = CharacterControlData->bInheritRoll;
+	CameraBoom->bDoCollisionTest = CharacterControlData->bDoCollisionTest;
+}
 
 void ASZCharacterPlayer::Move(const FInputActionValue& Value)
 {
@@ -193,6 +217,22 @@ void ASZCharacterPlayer::Move(const FInputActionValue& Value)
 void ASZCharacterPlayer::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	if (!LookAxisVector.IsNearlyZero())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Look V=(%f,%f)"), LookAxisVector.X, LookAxisVector.Y);
+	}
+
+	AddControllerYawInput(LookAxisVector.X);
+	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void ASZCharacterPlayer::MouseLook(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	if (!LookAxisVector.IsNearlyZero())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Look V=(%f,%f)"), LookAxisVector.X, LookAxisVector.Y);
+	}
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);

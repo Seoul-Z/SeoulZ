@@ -47,7 +47,7 @@ protected:
 	// 캐릭터 컨트롤
 	void ChangeCharacterControl();
 	void SetCharacterControl(ECharacterControlType NewCharacterControlType);
-	/*virtual void SetCharacterControlData(const class USZCharacterControlData* CharacterControlData) override;*/
+	void SetCharacterControlData(const class USZCharacterControlData* CharacterControlData);
 
 	// 카메라/이동 세팅 적용 (필요 시 분리)
 	void ApplyThirdPersonSettings(bool bInstant = false);
@@ -129,6 +129,7 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void MouseLook(const FInputActionValue& Value);
 
 	void ThirdMove(const FInputActionValue& Value);
 	void ThirdLook(const FInputActionValue& Value);
@@ -140,6 +141,6 @@ protected:
 
 private:
 	bool bWantsBlend = false;
-	float BlendAlpha = 1.f; // 0=3인칭, 1=1인칭
+	float BlendAlpha = 1.0f; // 0=3인칭, 1=1인칭
 	ECharacterControlType TargetControlType = ECharacterControlType::ThirdPerson;
 };
