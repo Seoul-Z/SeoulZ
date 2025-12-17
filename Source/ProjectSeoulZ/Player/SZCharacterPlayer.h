@@ -86,14 +86,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Camera|Blend")
 	float CameraBlendSpeed = 12.f;
 
-
-
-
-
-	// 입력 맵핑
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> JumpAction;
 
@@ -102,9 +94,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> MoveAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> MouseLookAction;
@@ -128,7 +117,6 @@ protected:
 	TObjectPtr<class UInputAction> SkillAction;
 
 	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
 	void MouseLook(const FInputActionValue& Value);
 
 	void ThirdMove(const FInputActionValue& Value);
