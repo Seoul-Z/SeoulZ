@@ -2,33 +2,31 @@
 
 //﻿---------------------------------------------------------------------------------------------------------
 // Author		: 안재범
-// Date			: 2025-12-15
+// Date			: 2025-12-18
 // Copyright	: CodingDead
-// Description	: 로비 레벨이 불려졌을 때 사용할 GameMode 클래스.
+// Description	: ModeSelectBox 위젯 클래스.
 //				  
 //----------------------------------------------------------------------------------------------------------
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
-#include "SZLobbyMode.generated.h"
+#include "Blueprint/UserWidget.h"
+#include "SZSelectingMapWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTSEOULZ_API ASZLobbyMode : public AGameModeBase
+class PROJECTSEOULZ_API USZSelectingMapWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
 
 
 protected:
 
 
-protected:
-
-
+	
 };
