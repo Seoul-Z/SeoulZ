@@ -22,13 +22,14 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UUserWidget> PlayerHUD;
+ 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IMC", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> CurrentCharacterContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> PlayerHUDClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UUserWidget> PlayerHUD;
 };
