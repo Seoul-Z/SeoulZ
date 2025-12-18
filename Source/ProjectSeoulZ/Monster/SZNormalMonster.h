@@ -67,6 +67,7 @@ protected:
 
 	UPROPERTY()
 	class UGameplayAbility* CurrentAttackAbility;
+
 	
 	
 };

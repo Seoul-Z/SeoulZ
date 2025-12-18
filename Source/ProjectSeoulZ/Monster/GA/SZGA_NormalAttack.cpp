@@ -10,6 +10,9 @@
 #include "Physics/SZCollision.h"
 #include "CollisionQueryParams.h"
 #include "Components/CapsuleComponent.h"
+#include "AbilitySystemComponent.h"
+#include "Attribute/SZAttributeSet.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 USZGA_NormalAttack::USZGA_NormalAttack()
 {
@@ -116,18 +119,49 @@ void USZGA_NormalAttack::HitCheck()
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(NAME_None, false, NormalMonster);
 
+	UAbilitySystemComponent* ASC =  UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(NormalMonster);
+	if (!ASC)
+	{
+		UE_LOG(LogTemp, Log, TEXT("ASC is nullptr"));
+		return;
+	}
+
+	const USZAttributeSet* AttributeSet = ASC->GetSet<USZAttributeSet>();
+	if (!AttributeSet)
+	{
+		UE_LOG(LogTemp, Log, TEXT("AttributeSet is null"));
+		return;
+	}
+
 	// 나중에 값으로 어트리뷰트 셋으로 교체해야 함.
-	const float AttackRange = 40.0f;
-	const float AttackRadius = 50.0f;
-	const float AttackDamage = 30.0f;
+	const float AttackRange = AttributeSet->GetAttackRange();
+	const float AttackRadius = AttributeSet->GetAttackRadius();
+	const float AttackDamage = AttributeSet->GetAttackDamage();
 	const FVector Start = NormalMonster->GetActorLocation() + NormalMonster->GetActorForwardVector() 
 						  * NormalMonster ->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + NormalMonster->GetActorForwardVector() * AttackRange;
 
+	// 후에 플레이어 전용 채널로 바꿔야 함.
 	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_SZACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
 	if (HitDetected)
 	{
+		UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Ensured();
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OutHitResult.GetActor());
+		if (!SourceASC || !TargetASC)
+		{
+			UE_LOG(LogTemp, Log, TEXT("ASC not found!"));
+			return;
+		}
 
+		const USZAttributeSet* SourceAttribute = SourceASC->GetSet<USZAttributeSet>();
+		USZAttributeSet* TargetAttribute = const_cast<USZAttributeSet*>(TargetASC->GetSet<USZAttributeSet>());
+		if (!SourceAttribute || !TargetAttribute)
+		{
+			UE_LOG(LogTemp, Log, TEXT("ASC not found!"));
+			return;
+		}
+
+		TargetAttribute->SetHealth(TargetAttribute->GetHealth() - AttackDamage);
 	}
 
 #if ENABLE_DRAW_DEBUG

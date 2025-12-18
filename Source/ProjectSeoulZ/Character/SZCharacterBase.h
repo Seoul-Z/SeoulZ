@@ -40,7 +40,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GAS)
 	TObjectPtr<class UAbilitySystemComponent> ASC;
 
-
-
+	UPROPERTY()
+	TObjectPtr<class USZAttributeSet> AttributeSet;
 
 };

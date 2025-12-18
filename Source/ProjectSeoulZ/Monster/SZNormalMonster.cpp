@@ -9,12 +9,13 @@
 #include "Monster/GA/SZGA_NormalAttack.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Attribute/SZAttributeSet.h"
 
 ASZNormalMonster::ASZNormalMonster()
 {
 	AIControllerClass = ASZNormalAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
+	
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animation/ABP_NormalMonster.ABP_NormalMonster_C"));
 	if (AnimInstanceClassRef.Class)
 	{
@@ -22,6 +23,7 @@ ASZNormalMonster::ASZNormalMonster()
 	}
 
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	AttributeSet = CreateDefaultSubobject<USZAttributeSet>(TEXT("AttributeSet"));
 
 }
 
