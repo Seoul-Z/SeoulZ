@@ -60,6 +60,13 @@ void ASZItemBase::BeginPlay()
 void ASZItemBase::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
+
+	// 메쉬가 있을 때만 물리 시뮬레이션
+	if (StaticMeshComp && StaticMeshComp->GetStaticMesh())
+	{
+		StaticMeshComp->SetSimulatePhysics(true);
+	}
+
 	SetStaticMesh();
 }
 
