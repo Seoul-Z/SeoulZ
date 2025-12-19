@@ -49,7 +49,7 @@ public:
 	void PlayItemSFX(USoundBase* Sound) const;
 	USoundBase* GetItemSFX(int32 ItemID) const;
 	// 아이템 줍기
-	int32 PickUp(int32 ItemID, int32 ItemCount, bool& bSuccess);
+	int32 PickUp(int32 ItemID, int32 ItemCount);
 
 	UFUNCTION(BlueprintCallable)
 	void PrintInventory();

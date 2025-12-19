@@ -96,7 +96,7 @@ USoundBase* USZInventoryComponent::GetItemSFX(int32 ItemID) const
 	}
 }
 
-int32 USZInventoryComponent::PickUp(int32 ItemID, int32 ItemCount, bool& bSuccess)
+int32 USZInventoryComponent::PickUp(int32 ItemID, int32 ItemCount)
 {
 	// 
 
@@ -129,7 +129,6 @@ int32 USZInventoryComponent::PickUp(int32 ItemID, int32 ItemCount, bool& bSucces
 		PlayItemSFX(GetItemSFX(ItemID));
 	}
 
-	bSuccess = !bLIsFull;
 	return LItemCount;
 }
 
