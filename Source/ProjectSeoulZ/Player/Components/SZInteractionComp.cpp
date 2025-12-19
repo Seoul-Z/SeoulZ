@@ -92,12 +92,17 @@ void USZInteractionComp::InteractionTrace()
 
 void USZInteractionComp::PickUpItem()
 {
+    if (!Item)
+    {
+        return;
+	}
+
     // Item을 주웠을 시 
     USZItemDataComp* ItemDataComp = Item->FindComponentByClass<USZItemDataComp>();
     if (ItemDataComp)
     {
 		// ItemDataComp의 OnInteractWith 실행
-        ISZInteractionInterface::Execute_OnInteractWith(Item, GetOwner());
+        ISZInteractionInterface::Execute_OnInteractWith(ItemDataComp, GetOwner());
     }
 }
 

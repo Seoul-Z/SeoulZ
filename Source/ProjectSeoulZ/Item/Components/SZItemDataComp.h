@@ -30,7 +30,7 @@ public:
 	virtual void OnInteractWith_Implementation(AActor* Interactor) override;
 	virtual FText OnLookAt_Implementation() const override;
 
-	void PickUpItem(AActor* InItem);
+	void PickUpItem(AActor* Interactor);
 
 protected:
 	// Called when the game starts
@@ -40,7 +40,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-private:
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item, Meta = (AllowPrivateAccess = "true"))
 	int32 StackCount = 1;
 };

@@ -3,6 +3,7 @@
 
 #include "SZItemDataComp.h"
 #include "Player/Components/SZInventoryComponent.h"
+#include "Item/SZItemBase.h"
 
 // Sets default values for this component's properties
 USZItemDataComp::USZItemDataComp()
@@ -24,25 +25,25 @@ FText USZItemDataComp::OnLookAt_Implementation() const
 	return FText();
 }
 
-void USZItemDataComp::PickUpItem(AActor* InInteractor)
+void USZItemDataComp::PickUpItem(AActor* Interactor)
 {
-	// TODO. 아이템 파괴 대신, 오브젝트 폴링
-	// GetOwner()->Destroy(); 
-	
-	TObjectPtr<USZInventoryComponent> InventoryComp = Interactor->FindComponentByClass<USZInventoryComponent>();
-	if (IsValid(InventoryComp))
+	USZInventoryComponent* InventoryComp = Interactor? 
+		Interactor->FindComponentByClass<USZInventoryComponent>() : nullptr;
+	if (!IsValid(InventoryComp)) 
 	{
-		/*const FName ItemID = ItemData.RowName;
-		const int32 Quantity = ItemQuantity;
-		InventoryComp->PickUp(ItemID, ItemQuantity);
-		GetOwner()->Destroy();
-		bool bSuccess = InventoryComp->PickUp(ItemID, Quantity);
-
-		if (bSuccess)
-		{
-			Destroy();
-		}*/
+		return;
 	}
+
+	ASZItemBase* ItemOwner = Cast<ASZItemBase>(GetOwner());
+	if (!IsValid(ItemOwner))
+	{
+		return;
+	}
+
+	FName ItemID = ItemOwner->GetItemID();
+	int32 N = InventoryComp->PickUp(ItemID, StackCount);
+	// TODO. 아이템 파괴 대신, 오브젝트 폴링으로 코드 변경
+	GetOwner()->Destroy();
 }
 
 // Called when the game starts
@@ -53,7 +54,6 @@ void USZItemDataComp::BeginPlay()
 	// ...
 	
 }
-
 
 // Called every frame
 void USZItemDataComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

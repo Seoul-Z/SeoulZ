@@ -15,32 +15,34 @@ USZInventoryComponent::USZInventoryComponent()
 	// ...
 }
 
-const TObjectPtr<FItemTemplete> USZInventoryComponent::GetItemData(int32 ItemID) const
+const FItemTemplete* USZInventoryComponent::GetItemData(FName ItemID) const
 {
-	if (DT_ItemData)
+	if (ItemData)
 	{
-		const FName RowName(*FString::FromInt(ItemID));
-		return DT_ItemData->FindRow<FItemTemplete>(RowName, TEXT("GetItemData"));
+		return ItemData->FindRow<FItemTemplete>(ItemID, TEXT("GetItemData"));
 	}
+	return nullptr;
 }
 
-int32 USZInventoryComponent::FindMatchingSlot(int32 ItemID) const
+int32 USZInventoryComponent::FindMatchingSlot(FName ItemID) const
 {
-	const TObjectPtr<FItemTemplete> Info = GetItemData(ItemID);
+	const FItemTemplete* Item = GetItemData(ItemID);
+	if (!Item) 
+		return INDEX_NONE;
+
 	for (int32 i = 0; i < ItemSlots.Num(); ++i)
 	{
 		const FItemSlot& Slot = ItemSlots[i];
 
-		const bool bSameItem = (Slot.ItemId == ItemID);
-		const bool bNotFull = (Slot.StackCount > 0 && Slot.StackCount < Info->MaxStackCount);
-
-		if (bSameItem && bNotFull)
+		if (Slot.ItemID == ItemID &&
+			Slot.StackCount > 0 &&
+			Slot.StackCount <= Item->MaxStackCount)
 		{
 			return i;
 		}
 	}
 
-	return -1;
+	return INDEX_NONE;
 }
 
 int32 USZInventoryComponent::FindEmptySlot() const
@@ -55,24 +57,30 @@ int32 USZInventoryComponent::FindEmptySlot() const
 	return -1;
 }
 
-void USZInventoryComponent::AddToSlot(int32 Index, int32 ItemCount)
+void USZInventoryComponent::AddToSlot(FName ItemID, int32 Index, int32 ItemCount)
 {
 	if (!ItemSlots.IsValidIndex(Index) || ItemCount <= 0)
 	{
 		return;
 	}
 
-	ItemSlots[Index].StackCount += ItemCount;
+	const FItemTemplete* Item = GetItemData(ItemID);
+	if (!Item)
+		return;
+
+	// TODO. MaxStackCount에서 남은 아이템 처리 어떻게 할지
+	ItemSlots[Index].StackCount += ItemSlots[Index].StackCount;
 }
 
-void USZInventoryComponent::AddToNewSlot(uint8 ItemID, int32 ItemCount, int32 Index)
+void USZInventoryComponent::AddToNewSlot(FName ItemID, int32 ItemCount, int32 Index)
 {
 	if (!ItemSlots.IsValidIndex(Index))
 	{
 		return;
 	}
 
-	ItemSlots[Index] = FItemSlot{ ItemID, ItemCount };
+	ItemSlots[Index].ItemID = ItemID;
+	ItemSlots[Index].StackCount = ItemCount;
 }
 
 void USZInventoryComponent::PlayItemSFX(USoundBase* Sound) const
@@ -87,29 +95,27 @@ void USZInventoryComponent::PlayItemSFX(USoundBase* Sound) const
 	}
 }
 
-USoundBase* USZInventoryComponent::GetItemSFX(int32 ItemID) const
+USoundBase* USZInventoryComponent::GetItemSFX(FName ItemID) const
 {
-	const TObjectPtr<FItemTemplete> Info = GetItemData(ItemID);
-	if (Info)
+	const FItemTemplete* Item = GetItemData(ItemID);
+	if (Item)
 	{
-		return Info->ItemSFX.Pickup;
+		return Item->ItemSFX.Pickup;
 	}
+	return nullptr;
 }
 
-int32 USZInventoryComponent::PickUp(int32 ItemID, int32 ItemCount)
+int32 USZInventoryComponent::PickUp(FName ItemID, int32 ItemCount)
 {
-	// 
-
 	int32 LItemCount = FMath::Max(0, ItemCount);
 	bool bLIsFull = false;
 
 	while (LItemCount > 0 && !bLIsFull)
 	{
 		const int32 index = FindMatchingSlot(ItemID);
-
 		if (index != -1 /*INDEX_NONE*/)
 		{
-			AddToSlot(index, 1);
+			AddToSlot(ItemID, index, 1);
 		}
 		else
 		{
@@ -118,11 +124,11 @@ int32 USZInventoryComponent::PickUp(int32 ItemID, int32 ItemCount)
 			{
 				AddToNewSlot(ItemID, 1, EmptyIndex);
 			}
-			else
+			/*else
 			{
 				bLIsFull = true;
 				return ItemSlots[index].StackCount;
-			}
+			}*/
 		}
 
 		LItemCount -= 1;
@@ -138,9 +144,9 @@ void USZInventoryComponent::PrintInventory()
 	{
 		const FItemSlot Slot = ItemSlots[i];
 		const FString ResultString = FString::Printf(
-			TEXT("Slot %d | ItemID: %d | StackCount: %d"),
+			TEXT("Slot %d | ItemID: %s | StackCount: %d"),
 			i,
-			Slot.ItemId,
+			*Slot.ItemID.ToString(),
 			Slot.StackCount
 		);
 
@@ -156,7 +162,7 @@ void USZInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ItemSlots.SetNum(InventorySize);
+	ItemSlots.SetNum(MaxSlotCount);
 }
 
 // Called every frame

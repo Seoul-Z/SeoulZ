@@ -17,6 +17,7 @@
 #include "Character/SZCharacterBase.h"
 #include "AbilitySystemInterface.h"
 #include "InputActionValue.h"
+#include "Player/Components/SZInteractionComp.h"
 #include "SZCharacterPlayer.generated.h"
 
 UENUM()
@@ -116,6 +117,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SkillAction;
 
+	// 아이템 줍기 - 입력 값
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> PickUpAction;
+
 	void Move(const FInputActionValue& Value);
 	void MouseLook(const FInputActionValue& Value);
 
@@ -125,10 +130,17 @@ protected:
 	void FirstMove(const FInputActionValue& Value);
 	void FirstLook(const FInputActionValue& Value);
 
+	// 아이템 줍기 - 함수
+	void PickUp(const FInputActionValue& Value);
+
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 private:
 	bool bWantsBlend = false;
 	float BlendAlpha = 1.0f; // 0=3인칭, 1=1인칭
 	ECharacterControlType TargetControlType = ECharacterControlType::ThirdPerson;
+
+	// 상호작용 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USZInteractionComp> InteractionComp;
 };

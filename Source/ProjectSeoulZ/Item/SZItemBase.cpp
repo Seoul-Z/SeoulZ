@@ -15,6 +15,11 @@ ASZItemBase::ASZItemBase()
 	ItemDataComp = CreateDefaultSubobject<USZItemDataComp>(TEXT("ItemDataComp"));
 }
 
+const FName ASZItemBase::GetItemID() const 
+{
+	return ItemDataHandle.RowName;
+}
+
 const FItemTemplete* ASZItemBase::GetItemData() const
 {
 	return ItemDataHandle.GetRow<FItemTemplete>(TEXT("GetItemData"));

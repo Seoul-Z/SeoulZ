@@ -60,6 +60,8 @@ ASZCharacterPlayer::ASZCharacterPlayer()
 		MouseLookAction = InputActionMouseLookRef.Object;
 	}
 
+	// 상호작용 컴포넌트 생성
+	InteractionComp = CreateDefaultSubobject<USZInteractionComp>(TEXT("InteractionComp"));
 }
 
 void ASZCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -80,6 +82,8 @@ void ASZCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ASZCharacterPlayer::MouseLook);
 	EnhancedInputComponent->BindAction(ChangeControlAction, ETriggerEvent::Started, this, &ASZCharacterPlayer::ChangeCharacterControl);
 
+	// 아이템 줍기
+	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Started, this, &ASZCharacterPlayer::PickUp);
 }
 
 void ASZCharacterPlayer::BeginPlay()
@@ -213,6 +217,14 @@ void ASZCharacterPlayer::FirstMove(const FInputActionValue& Value)
 
 void ASZCharacterPlayer::FirstLook(const FInputActionValue& Value)
 {
+}
+
+void ASZCharacterPlayer::PickUp(const FInputActionValue& Value)
+{
+	if (InteractionComp)
+	{
+		InteractionComp->PickUpItem();
+	}
 }
 
 UAbilitySystemComponent* ASZCharacterPlayer::GetAbilitySystemComponent() const

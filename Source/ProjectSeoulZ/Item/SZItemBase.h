@@ -29,6 +29,7 @@ public:
 	// Sets default values for this actor's properties
 	ASZItemBase();
 
+	const FName GetItemID() const;
 	const FItemTemplete* GetItemData() const;
 	virtual FText OnLookAt_Implementation() const override;
 
