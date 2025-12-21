@@ -13,7 +13,7 @@
 // Copyright    : Coding Dead
 //
 // Description  : 인벤토리 컴포넌트
-//           인벤토리 슬롯 구조체 및 인벤토리 기능 구현    
+//           아이템 데이터, 슬롯, 로직 등 인벤토리 기능. 보여주는 기능은 Actor에서 관리    
 //             
 //----------------------------------------------------------------------------------------------------------
 
@@ -28,6 +28,8 @@ struct FItemSlot
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 StackCount = 0; 
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTSEOULZ_API USZInventoryComponent : public UActorComponent
@@ -65,6 +67,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+	UPROPERTY(BlueprintAssignable, Category = "Inventory")
+	FOnInventoryUpdated OnInventoryUpdated;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory | Data")
 	TObjectPtr<UDataTable> ItemData;
 

@@ -12,7 +12,7 @@ ASZItemBase::ASZItemBase()
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	SetRootComponent(StaticMeshComp);
 
-	ItemDataComp = CreateDefaultSubobject<USZItemDataComp>(TEXT("ItemDataComp"));
+	SZItemData = CreateDefaultSubobject<USZItemDataComp>(TEXT("SZItemData"));
 }
 
 const FName ASZItemBase::GetItemID() const 

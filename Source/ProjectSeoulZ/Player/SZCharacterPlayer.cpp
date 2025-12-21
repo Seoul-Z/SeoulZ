@@ -9,6 +9,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "Character/SZCharacterControlData.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/SZPlayerController.h"
+#include "Player/Components/SZInteractionComp.h"
+#include "Player/Components/SZInventoryComponent.h"
 
 ASZCharacterPlayer::ASZCharacterPlayer()
 {
@@ -61,7 +64,20 @@ ASZCharacterPlayer::ASZCharacterPlayer()
 	}
 
 	// 상호작용 컴포넌트 생성
-	InteractionComp = CreateDefaultSubobject<USZInteractionComp>(TEXT("InteractionComp"));
+	SZInteraction = CreateDefaultSubobject<USZInteractionComp>(TEXT("SZInteraction"));
+	// 인벤토리 컴포넌트 생성
+	SZInventory = CreateDefaultSubobject<USZInventoryComponent>(TEXT("SZInventory"));
+}
+
+void ASZCharacterPlayer::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	SZPC = Cast<ASZPlayerController>(NewController);
+	if (!SZPC) 
+	{
+		return;
+	}
 }
 
 void ASZCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -75,7 +91,6 @@ void ASZCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASZCharacterPlayer::Move);
@@ -84,6 +99,8 @@ void ASZCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	// 아이템 줍기
 	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Started, this, &ASZCharacterPlayer::PickUp);
+	// 인벤토리 열고 줍기
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ASZCharacterPlayer::ToggleInventory);
 }
 
 void ASZCharacterPlayer::BeginPlay()
@@ -114,7 +131,6 @@ void ASZCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterC
 		return;
 
 	AController* PlayerControllerCon = GetController();
-
 	const FRotator SavedControlRotation = PlayerControllerCon ? PlayerControllerCon->GetControlRotation() : FRotator::ZeroRotator;
 
 	CurrentControlType = NewCharacterControlType;
@@ -221,9 +237,17 @@ void ASZCharacterPlayer::FirstLook(const FInputActionValue& Value)
 
 void ASZCharacterPlayer::PickUp(const FInputActionValue& Value)
 {
-	if (InteractionComp)
+	if (SZInteraction)
 	{
-		InteractionComp->PickUpItem();
+		SZInteraction->PickUpItem();
+	}
+}
+
+void ASZCharacterPlayer::ToggleInventory(const FInputActionValue& Value)
+{
+	if (SZPC) 
+	{
+		SZPC->ToggleInventory();
 	}
 }
 

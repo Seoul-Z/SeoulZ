@@ -55,5 +55,5 @@ private:
 	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USZItemDataComp> ItemDataComp;
+	TObjectPtr<USZItemDataComp> SZItemData;
 };
