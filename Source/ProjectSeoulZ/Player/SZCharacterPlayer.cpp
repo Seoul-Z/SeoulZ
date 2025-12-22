@@ -129,12 +129,12 @@ void ASZCharacterPlayer::OnConstruction(const FTransform& Transform)
 		};
 
 	// BindFollower(FullBody);
-	BindFollower(Helmet);
+	// BindFollower(Helmet);
 	BindFollower(Vest);
 	BindFollower(Gloves);
 	BindFollower(Holster);
 	BindFollower(Magazine);
-	BindFollower(PrimaryWeapon);
+	// BindFollower(PrimaryWeapon);
 }
 
 void ASZCharacterPlayer::BeginPlay()

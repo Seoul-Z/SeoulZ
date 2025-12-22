@@ -148,11 +148,8 @@ protected:
 
 protected:
 	// 캐릭터 메쉬 컴포넌트
-	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
-	// TObjectPtr<USkeletalMeshComponent> FullBody;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
-	TObjectPtr<USkeletalMeshComponent> Helmet;
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Helmet;*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
 	TObjectPtr<USkeletalMeshComponent> Vest;
@@ -166,8 +163,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
 	TObjectPtr<USkeletalMeshComponent> Magazine;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
-	TObjectPtr<USkeletalMeshComponent> PrimaryWeapon;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	//TObjectPtr<USkeletalMeshComponent> PrimaryWeapon;
 
 private:
 	bool bWantsBlend = false;
@@ -177,6 +174,7 @@ private:
 	// 플레이어 컨트롤러
 	UPROPERTY(Transient)
 	TObjectPtr<ASZPlayerController> SZPC;
+
 	// 상호작용 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USZInteractionComp> SZInteraction;
