@@ -63,6 +63,19 @@ ASZCharacterPlayer::ASZCharacterPlayer()
 		MouseLookAction = InputActionMouseLookRef.Object;
 	}
 
+	// 캐릭터 메시
+	Vest = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Vest"));
+	Vest->SetupAttachment(GetMesh());
+
+	Gloves = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Gloves"));
+	Gloves->SetupAttachment(GetMesh());
+
+	Holster = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Holster"));
+	Holster->SetupAttachment(GetMesh());
+
+	Magazine = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Magazine"));
+	Magazine->SetupAttachment(GetMesh());
+
 	// 상호작용 컴포넌트 생성
 	SZInteraction = CreateDefaultSubobject<USZInteractionComp>(TEXT("SZInteraction"));
 	// 인벤토리 컴포넌트 생성
@@ -129,12 +142,12 @@ void ASZCharacterPlayer::OnConstruction(const FTransform& Transform)
 		};
 
 	// BindFollower(FullBody);
-	BindFollower(Helmet);
+	// BindFollower(Helmet);
 	BindFollower(Vest);
 	BindFollower(Gloves);
 	BindFollower(Holster);
 	BindFollower(Magazine);
-	BindFollower(PrimaryWeapon);
+	// BindFollower(PrimaryWeapon);
 }
 
 void ASZCharacterPlayer::BeginPlay()

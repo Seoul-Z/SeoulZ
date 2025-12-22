@@ -151,8 +151,8 @@ protected:
 	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
 	// TObjectPtr<USkeletalMeshComponent> FullBody;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
-	TObjectPtr<USkeletalMeshComponent> Helmet;
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Helmet;*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
 	TObjectPtr<USkeletalMeshComponent> Vest;
@@ -166,8 +166,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
 	TObjectPtr<USkeletalMeshComponent> Magazine;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
-	TObjectPtr<USkeletalMeshComponent> PrimaryWeapon;
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> PrimaryWeapon;*/
 
 private:
 	bool bWantsBlend = false;
