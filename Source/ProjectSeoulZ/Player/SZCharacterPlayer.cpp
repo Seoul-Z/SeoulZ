@@ -107,34 +107,30 @@ void ASZCharacterPlayer::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	USkeletalMeshComponent* Leader = GetMesh();
-	if (!IsValid(Leader))
+	USkeletalMeshComponent* CharacterMesh = GetMesh();
+	if (!IsValid(CharacterMesh))
 	{
 		return;
 	}
 
-	auto BindFollower = [&](USkeletalMeshComponent* Follower)
+	auto Equipment = [&](USkeletalMeshComponent* Follower)
 		{
-			if (!IsValid(Follower) || Follower == Leader)
+			if (!IsValid(Follower) || Follower == CharacterMesh)
 			{
 				return;
 			}
 			const bool bForceUpdate = true;
 			const bool bFollowerShouldTickPose = false;
 
-			Follower->SetLeaderPoseComponent(Leader, bForceUpdate, bFollowerShouldTickPose);
-
+			Follower->SetLeaderPoseComponent(CharacterMesh, bForceUpdate, bFollowerShouldTickPose);
 			// Follower->bUpdateAnimationInEditor = false;
 			// Follower->SetAnimationMode(EAnimationMode::AnimationBlueprint); 
 		};
 
-	// BindFollower(FullBody);
-	// BindFollower(Helmet);
-	BindFollower(Vest);
-	BindFollower(Gloves);
-	BindFollower(Holster);
-	BindFollower(Magazine);
-	// BindFollower(PrimaryWeapon);
+	Equipment(Vest);
+	Equipment(Gloves);
+	Equipment(Holster);
+	Equipment(Magazine);
 }
 
 void ASZCharacterPlayer::BeginPlay()

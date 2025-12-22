@@ -25,6 +25,8 @@ public:
 	// Sets default values for this actor's properties
 	ASZWardrobe();
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,4 +35,23 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Root")
+	TObjectPtr<USceneComponent> Root;
+
+	// 캐릭터 메쉬 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> CharacterMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Vest;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Gloves;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Holster;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Magazine;
 };
