@@ -9,6 +9,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "Character/SZCharacterControlData.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/SZPlayerController.h"
+#include "Player/Components/SZInteractionComp.h"
+#include "Player/Components/SZInventoryComponent.h"
 
 ASZCharacterPlayer::ASZCharacterPlayer()
 {
@@ -60,6 +63,21 @@ ASZCharacterPlayer::ASZCharacterPlayer()
 		MouseLookAction = InputActionMouseLookRef.Object;
 	}
 
+	// 상호작용 컴포넌트 생성
+	SZInteraction = CreateDefaultSubobject<USZInteractionComp>(TEXT("SZInteraction"));
+	// 인벤토리 컴포넌트 생성
+	SZInventory = CreateDefaultSubobject<USZInventoryComponent>(TEXT("SZInventory"));
+}
+
+void ASZCharacterPlayer::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	SZPC = Cast<ASZPlayerController>(NewController);
+	if (!SZPC) 
+	{
+		return;
+	}
 }
 
 void ASZCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -73,13 +91,50 @@ void ASZCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASZCharacterPlayer::Move);
 	EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ASZCharacterPlayer::MouseLook);
 	EnhancedInputComponent->BindAction(ChangeControlAction, ETriggerEvent::Started, this, &ASZCharacterPlayer::ChangeCharacterControl);
 
+	// 아이템 줍기
+	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Started, this, &ASZCharacterPlayer::PickUp);
+	// 인벤토리 열고 줍기
+	EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &ASZCharacterPlayer::ToggleInventory);
+}
+
+void ASZCharacterPlayer::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	USkeletalMeshComponent* Leader = GetMesh();
+	if (!IsValid(Leader))
+	{
+		return;
+	}
+
+	auto BindFollower = [&](USkeletalMeshComponent* Follower)
+		{
+			if (!IsValid(Follower) || Follower == Leader)
+			{
+				return;
+			}
+			const bool bForceUpdate = true;
+			const bool bFollowerShouldTickPose = false;
+
+			Follower->SetLeaderPoseComponent(Leader, bForceUpdate, bFollowerShouldTickPose);
+
+			// Follower->bUpdateAnimationInEditor = false;
+			// Follower->SetAnimationMode(EAnimationMode::AnimationBlueprint); 
+		};
+
+	// BindFollower(FullBody);
+	BindFollower(Helmet);
+	BindFollower(Vest);
+	BindFollower(Gloves);
+	BindFollower(Holster);
+	BindFollower(Magazine);
+	BindFollower(PrimaryWeapon);
 }
 
 void ASZCharacterPlayer::BeginPlay()
@@ -110,7 +165,6 @@ void ASZCharacterPlayer::SetCharacterControl(ECharacterControlType NewCharacterC
 		return;
 
 	AController* PlayerControllerCon = GetController();
-
 	const FRotator SavedControlRotation = PlayerControllerCon ? PlayerControllerCon->GetControlRotation() : FRotator::ZeroRotator;
 
 	CurrentControlType = NewCharacterControlType;
@@ -213,6 +267,22 @@ void ASZCharacterPlayer::FirstMove(const FInputActionValue& Value)
 
 void ASZCharacterPlayer::FirstLook(const FInputActionValue& Value)
 {
+}
+
+void ASZCharacterPlayer::PickUp(const FInputActionValue& Value)
+{
+	if (SZInteraction)
+	{
+		SZInteraction->PickUpItem();
+	}
+}
+
+void ASZCharacterPlayer::ToggleInventory(const FInputActionValue& Value)
+{
+	if (SZPC) 
+	{
+		SZPC->ToggleInventory();
+	}
 }
 
 UAbilitySystemComponent* ASZCharacterPlayer::GetAbilitySystemComponent() const

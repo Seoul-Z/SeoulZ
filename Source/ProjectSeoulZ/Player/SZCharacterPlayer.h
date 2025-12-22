@@ -19,6 +19,10 @@
 #include "InputActionValue.h"
 #include "SZCharacterPlayer.generated.h"
 
+class ASZPlayerController;
+class USZInteractionComp;
+class USZInventoryComponent;
+
 UENUM()
 enum class ECharacterControlType : uint8
 {
@@ -37,7 +41,9 @@ class PROJECTSEOULZ_API ASZCharacterPlayer : public ASZCharacterBase
 public:
 	ASZCharacterPlayer();
 
+	virtual void PossessedBy(AController* NewController) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
 	// 캐릭터 게임 시작 및 죽음
@@ -116,6 +122,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> SkillAction;
 
+	// 아이템 줍기 - 입력 값
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> PickUpAction;
+
+	// 인벤토리 열기 - 입력 값
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> InventoryAction;
+
 	void Move(const FInputActionValue& Value);
 	void MouseLook(const FInputActionValue& Value);
 
@@ -125,10 +139,48 @@ protected:
 	void FirstMove(const FInputActionValue& Value);
 	void FirstLook(const FInputActionValue& Value);
 
+	// 아이템 줍기
+	void PickUp(const FInputActionValue& Value);
+	// 인벤토리 열고 닫기
+	void ToggleInventory(const FInputActionValue& Value);
+
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+protected:
+	// 캐릭터 메쉬 컴포넌트
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	// TObjectPtr<USkeletalMeshComponent> FullBody;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Helmet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Vest;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Gloves;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Holster;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> Magazine;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<USkeletalMeshComponent> PrimaryWeapon;
 
 private:
 	bool bWantsBlend = false;
 	float BlendAlpha = 1.0f; // 0=3인칭, 1=1인칭
 	ECharacterControlType TargetControlType = ECharacterControlType::ThirdPerson;
+
+	// 플레이어 컨트롤러
+	UPROPERTY(Transient)
+	TObjectPtr<ASZPlayerController> SZPC;
+	// 상호작용 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USZInteractionComp> SZInteraction;
+	// 인벤토리 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USZInventoryComponent> SZInventory;
 };
