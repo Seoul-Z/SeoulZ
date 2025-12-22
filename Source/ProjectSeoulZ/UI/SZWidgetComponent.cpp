@@ -6,11 +6,11 @@
 
 void USZWidgetComponent::InitWidget()
 {
-	/*Super:InitWidget();
+	Super::InitWidget();
 
 	USZUserWidget* UserWidget = Cast<USZUserWidget>(GetWidget());
 	if (UserWidget)
 	{
-
-	}*/
+		UserWidget->SetAbilitySystemComponent(GetOwner());
+	}
 }

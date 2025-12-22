@@ -2,9 +2,10 @@
 
 
 #include "Attribute/SZAttributeSet.h"
+#include "Net/UnrealNetwork.h"
 
-USZAttributeSet::USZAttributeSet() :
-	AttackRange(100.0f),
+USZAttributeSet::USZAttributeSet() 
+	/*AttackRange(100.0f),
 	MaxAttackRange(300.0f),
 	AttackRadius(50.0f),
 	AttackRate(30.0f),
@@ -12,9 +13,9 @@ USZAttributeSet::USZAttributeSet() :
 	MaxAttackRate(100.0f),
 	MaxHealth(100.0f),
 	AttackDamage(30.0f),
-	MaxAttackDamage(50.0f)
+	MaxAttackDamage(50.0f)*/
 {
-	InitHealth(GetMaxHealth());
+	//InitHealth(GetMaxHealth());
 }
 
 void USZAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -32,3 +33,4 @@ void USZAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, f
 		UE_LOG(LogTemp, Log, TEXT("Health : %f -> %f"),OldValue,NewValue);
 	}
 }
+

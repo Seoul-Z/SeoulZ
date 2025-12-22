@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "UI/SZUserWidget.h"
+#include "GameplayEffectTypes.h"
+#include "UI/SZHpBarViewModel.h"
+#include "Blueprint/UserWidget.h"
 #include "SZHpBarUserWidget.generated.h"
 
 /**
@@ -15,8 +18,22 @@ class PROJECTSEOULZ_API USZHpBarUserWidget : public USZUserWidget
 	GENERATED_BODY()
 	
 protected:
+	virtual void SetAbilitySystemComponent(AActor* InOwner) override;
+
+	virtual void OnHealthChanged(const FOnAttributeChangeData& ChangeData);
+	virtual void OnMaxHealthChanged(const FOnAttributeChangeData& ChangeData);
+
+	void UpdateHpBar();
 
 protected:
-	float CurrentHealth;
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UProgressBar> PbHpBar;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<class UTextBlock> TxtHpStat;
+
+	float CurrentHealth = 0.0f;
 	float CurrentMaxHealth = 0.1f;
+
+
 };

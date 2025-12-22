@@ -18,11 +18,12 @@
 #include "Interface/SZNormalAIInterface.h"
 #include "SZNormalMonsterAttackData.h"
 #include "Interface/SZMonsterAttackInterface.h"
+#include "Interface/SZPoolableInterface.h"
 #include "SZNormalMonster.generated.h"
 
 
 UCLASS()
-class PROJECTSEOULZ_API ASZNormalMonster : public ASZCharacterBase, public ISZNormalAIInterface, public ISZMonsterAttackInterface
+class PROJECTSEOULZ_API ASZNormalMonster : public ASZCharacterBase, public ISZNormalAIInterface, public ISZMonsterAttackInterface, public ISZPoolableInterface
 {
 	GENERATED_BODY()
 	
@@ -68,6 +69,19 @@ protected:
 	UPROPERTY()
 	class UGameplayAbility* CurrentAttackAbility;
 
-	
-	
+// UI Section
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class USZWidgetComponent> HpBar;
+
+	// ObjectPool Section
+protected:
+	virtual void OnSpawnFromPool_Implementation() override;
+
+	virtual void OnReturnToPool_Implementation() override;
+
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TSubclassOf<class UGameplayEffect> MonsterInitGE;
+
+
+
 };

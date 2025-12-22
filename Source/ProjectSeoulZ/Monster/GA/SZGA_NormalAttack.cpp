@@ -162,6 +162,7 @@ void USZGA_NormalAttack::HitCheck()
 		}
 
 		TargetAttribute->SetHealth(TargetAttribute->GetHealth() - AttackDamage);
+
 	}
 
 #if ENABLE_DRAW_DEBUG

@@ -10,6 +10,9 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Attribute/SZAttributeSet.h"
+#include "UI/SZWidgetComponent.h"
+#include "UI/SZUserWidget.h"
+#include "UI/SZHpBarUserWidget.h"
 
 ASZNormalMonster::ASZNormalMonster()
 {
@@ -25,6 +28,18 @@ ASZNormalMonster::ASZNormalMonster()
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
 	AttributeSet = CreateDefaultSubobject<USZAttributeSet>(TEXT("AttributeSet"));
 
+	HpBar = CreateDefaultSubobject<USZWidgetComponent>(TEXT("Widget"));
+	HpBar->SetupAttachment(GetMesh());
+	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 8.0f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/UI/HUD/WBP_HpBar.WBP_HpBar_C"));
+	if (HpBarWidgetRef.Class)
+	{
+		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
+		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		HpBar->SetDrawSize(FVector2D(200.0f, 30.f));
+		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	}
 }
 
 
@@ -91,6 +106,14 @@ void ASZNormalMonster::PossessedBy(AController* NewController)
 
 	ASC->InitAbilityActorInfo(NewController, this);
 
+	ASC->ApplyGameplayEffectToSelf(
+		MonsterInitGE.GetDefaultObject(),
+		1.f,
+		ASC->MakeEffectContext()
+	);
+
+	AttributeSet->InitHealth(AttributeSet->GetMaxHealth());
+
 	FGameplayAbilitySpec AttackSkillSpec(USZGA_NormalAttack::StaticClass());
 	ASC->GiveAbility(AttackSkillSpec);
 }
@@ -111,6 +134,32 @@ void ASZNormalMonster::OnAttackHitNotify()
 		}
 	}
 }
+
+void ASZNormalMonster::OnSpawnFromPool_Implementation()
+{
+	// AI Run 시키기
+	ASZNormalAIController* NormalController = Cast<ASZNormalAIController>(GetController());
+
+	NormalController->RunAI();
+	
+	UE_LOG(LogTemp, Log, TEXT("Monster OnSpawnFromPool Call"));
+	SetActorHiddenInGame(false);
+	SetActorEnableCollision(true);
+}
+
+void ASZNormalMonster::OnReturnToPool_Implementation()
+{
+	// AI Stop 시키기
+	ASZNormalAIController* NormalController = Cast<ASZNormalAIController>(GetController());
+
+	NormalController->StopAI();
+
+	UE_LOG(LogTemp, Log, TEXT("Monster OnReturnFromPool Call"));
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
+}
+
+
 
 
 
